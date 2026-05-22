@@ -66,6 +66,24 @@ apt-get install -y --no-install-recommends \
 
 info "Dependencies installed."
 
+# ── 1b. Optional: Headless Chromium (for browser automation API) ──────────────
+info "Checking for Chromium (optional, needed for browser automation)..."
+if command -v chromium-browser &>/dev/null || command -v chromium &>/dev/null || command -v google-chrome &>/dev/null; then
+  CHROME_BIN=$(command -v chromium-browser || command -v chromium || command -v google-chrome)
+  info "Chromium found: $CHROME_BIN"
+else
+  warn "No Chromium/Chrome binary found."
+  warn "Browser automation features (page.goto, page.click, screenshots, etc.) will not work."
+  warn "To install: apt-get install -y chromium-browser"
+  read -r -p "Install chromium-browser now? [y/N] " INSTALL_CHROME
+  if [[ "$INSTALL_CHROME" =~ ^[Yy] ]]; then
+    apt-get install -y --no-install-recommends chromium-browser
+    info "Chromium installed."
+  else
+    info "Skipping Chromium. You can install it later with: apt-get install chromium-browser"
+  fi
+fi
+
 # ── 2. Create botwire system user ─────────────────────────────────────────────
 if ! id -u "$RUNNER_USER" &>/dev/null; then
   useradd --system --no-create-home --shell /bin/false "$RUNNER_USER"
@@ -177,6 +195,7 @@ echo "  Config dir:    $CONFIG_DIR"
 echo "  Binary:        $BINARY_PATH"
 echo "  Service:       ${SERVICE_NAME}<runnerID>"
 echo "  Logs:          /var/log/botwire-runner-<runnerID>.log"
+echo "  Chromium:      $(command -v chromium-browser || command -v chromium || command -v google-chrome || echo 'NOT INSTALLED (browser automation disabled)')"
 echo ""
 echo "  Next steps:"
 echo ""

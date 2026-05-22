@@ -122,6 +122,26 @@ The runner connects to the Botwire relay via WebSocket tunnel. All traffic is en
 | `BotwireShared` | Protocol types, bus contracts, agent scripts |
 | `BotwireTransferCore` | Snapshot serialization for deployment round-trips |
 
+## Browser Automation (Optional)
+
+The runner includes a built-in headless Chrome/Chromium controller via the Chrome DevTools Protocol (CDP). This powers the `browser.*` and `page.*` APIs in your Botwire projects — navigate pages, click elements, fill forms, take screenshots, evaluate JavaScript, etc.
+
+**Requires Chromium or Google Chrome** installed on the server:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y chromium-browser
+
+# Or Google Chrome
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt-get update && sudo apt-get install -y google-chrome-stable
+```
+
+If no Chrome binary is found, the runner still works — all other features (JS execution, HTTP routes, database, deploys) function normally. Only `browser.*` API calls will return an error.
+
+**Security**: Each project gets its own isolated Chrome process with a unique user-data-dir and random debug port. Processes are cleaned up after execution.
+
 ## systemd Service
 
 The setup script installs a parameterized systemd unit `botwire-runner@.service`:
