@@ -1,0 +1,4 @@
+module CJavaScriptCoreGTK [system] {
+    header "include/shim.h"
+    export *
+}
